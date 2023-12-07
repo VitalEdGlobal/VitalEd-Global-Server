@@ -1,11 +1,33 @@
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const auth = require("../auth");
 
+
+module.exports.userLogin = async (req, res) => {
+    try {
+        const result = await User.findOne({ username: req.body.username });
+
+        if (result == null) {
+            return res.send("User not found");
+        }
+
+        const isPasswordCorrect = bcrypt.compareSync(req.body.password, result.password);
+
+        if (isPasswordCorrect) {
+            return res.send({ access: auth.createAccessToken(result) });
+        } else {
+            return res.send("Login Failed");
+        }
+    } catch (error) {
+        return res.status(500).json({ message: 'An error occurred while updating the user role' });
+    }
+}
 
 
 module.exports.addUser = async (req, res) => {
 	let newUser = new User({
-		userName: req.body.userName,
-		password: req.body.password
+		username: req.body.username,
+		password: bcrypt.hashSync(req.body.password, 10)
 	})
 
 	try {
@@ -45,29 +67,33 @@ module.exports.deleteUser = async (req, res) => {
 }
 
 
+
 module.exports.updateUser = async (req, res) => {
-	const userId = req.params.userId;
+    const userId = req.params.userId;
     const { username, password } = req.body;
 
     try {
-        if (!username || !password) {
-            return res.status(400).send("Empty input fields");
+        if (!username) {
+            return res.status(400).send("Empty username field");
         }
 
         const userInfo = await User.findById({ _id: userId });
 
-        // Update fields if they're not empty
+        // Update username if not empty
         userInfo.username = username.trim() || userInfo.username;
-        userInfo.password = password.trim() || userInfo.password;
+
+        // Update password if provided
+        if (password) {
+            userInfo.password = bcrypt.hashSync(password.trim(), 10);
+        }
 
         console.log('User Data Updated');
         await userInfo.save();
-        
+
         return res.status(200).send(true);
     } catch (error) {
         console.error("Error updating data to Home:", error);
         return res.status(500).send("Error updating data to Home: " + error.message);
     }
 };
-
 

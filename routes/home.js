@@ -1,15 +1,16 @@
 const express = require('express');
 const homeController = require('../controllers/home');
+const auth = require("../auth");
 
-
+const {verify, verifyAdmin } = auth;
 
 
 const router = express.Router();
 
 
 router.get("/", homeController.showHome);
-router.post("/add", homeController.addHome);
-router.patch("/update", homeController.updateHome);
-router.delete("/delete", homeController.deleteHome);
+router.post("/add", verify, verifyAdmin, homeController.addHome);
+router.patch("/update", verify, verifyAdmin, homeController.updateHome);
+router.delete("/delete", verify, verifyAdmin, homeController.deleteHome);
 
 module.exports = router;

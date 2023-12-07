@@ -13,6 +13,8 @@ module.exports.createAccessToken = (user) => {
 };
 // [SECTION] Token Verification
 module.exports.verify = (req, res, next) => {
+			console.log(req.headers.authorization); // We should be expecting the JWT
+		// req.headers.authorization contains sensitive data and especially our token
 	let token = req.headers.authorization;
 
 	if(typeof token == 'undefined'){
