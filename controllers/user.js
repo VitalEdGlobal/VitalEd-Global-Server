@@ -3,6 +3,19 @@ const bcrypt = require("bcrypt");
 const auth = require("../auth");
 
 
+
+module.exports.usergetProfile = (req, res) => {
+
+    return User.findById(req.user.id)
+    .then(result => {
+        result.password = "";
+        return res.send(result);
+    })
+    .catch(err => res.send(err))
+};
+
+
+
 module.exports.userLogin = async (req, res) => {
     try {
         const result = await User.findOne({ username: req.body.username });

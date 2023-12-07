@@ -12,6 +12,6 @@ router.post("/login" , userController.userLogin);
 router.post("/add", verify, verifyAdmin, userController.addUser);
 router.delete("/:userId/delete", verify, verifyAdmin, userController.deleteUser);
 router.patch("/:userId/update", verify, verifyAdmin, userController.updateUser);
-
+router.get("/details", verify, userController.usergetProfile);
 
 module.exports = router;
